@@ -2,6 +2,7 @@ import hashlib
 import math
 import os
 import sys
+import getopt
 import time
 import func_timeout
 import requests
@@ -163,9 +164,31 @@ def upload_file(access_token, drive_id, parent_file_id='root', path=None, timeou
 
 
 if __name__ == '__main__':
-    refresh_token = '在Chrome DevTools Application中获取'
+    refresh_token = ""
+    input = ""
+    try:
+      opts, args = getopt.getopt(sys.argv[1:],"-h-f:-t:",["--help","--file=","--token="])
+    except getopt.GetoptError:
+      print ("Usage: main.py -t <token> -f <file>")
+      sys.exit()
+    for opt, arg in opts:
+      if opt in ('-h', '--help'):
+         print ("Usage: main.py -t <token> -f <file>")
+         sys.exit()
+      elif opt in ('-f', '--file'):
+         input = arg
+      elif opt in ('-t', '--token'):
+         refresh_token = arg
+
+    if refresh_token == "":
+       print ("Please use -t or --token to input refresh_token parameter")
+       sys.exit()
+    elif input == "":
+       print ("Please use -f or --file to input file path which is you want to upload")
+       sys.exit()
+
     access_token = refresh(refresh_token)
     user_info = get_user(access_token)
     drive_id = user_info['default_drive_id']
     # get_list(access_token, drive_id)
-    upload_file(access_token, drive_id, path='文件路径', timeout=15)
+    upload_file(access_token, drive_id, path=input, timeout=15)
